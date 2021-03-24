@@ -1,0 +1,212 @@
+syntax = "proto3";
+
+import "evaluation/evalApplication.proto";
+import "google/protobuf/field_mask.proto";
+
+package evaluation.v1;
+
+option go_package = "/pb";
+
+service Draft {
+  // CreateDraft新建评估草稿
+  // 用户有最大草稿数量限制，如果超过限制，会返回FailedPrecondition错误，Code=9
+  rpc CreateDraft(CreateDraftRequest) returns (CreateDraftResponse) {};
+  // UpdateDraft更新评估草稿字段
+  // 如果请求fieldName的值不为string类型，会检查fieldValue反序列化后的数据类型，如果检查失败返回InvalidArgument错误,Code=3
+  rpc UpdateDraftField(UpdateDraftFieldRequest)
+      returns (UpdateDraftFieldResponse) {};
+  // SubscribeFieldUpdated收听评估草稿字段更新时间
+  rpc SubscribeFieldUpdated(SubscribeFieldUpdatedRequest)
+      returns (stream SubscribeFieldUpdatedResponse) {};
+  // GetDraft根据DraftID获取完整评估草稿信息
+  rpc GetDraft(GetDraftRequest) returns (GetDraftResponse) {};
+  // ListDrafts返回用户目前所有draft简洁信息
+  rpc ListDrafts(ListDraftsRequest) returns (ListDraftsResponse) {};
+  rpc ApplyEvaluation(ApplyEvaluationRequest)
+      returns (ApplyEvaluationResponse) {};
+  rpc DelDraft(DelDraftRequest) returns (DelDraftResponse) {};
+}
+
+message CreateDraftRequest {
+  // applicantName为企业微信用户中文名
+  string applicantName = 1;
+}
+
+message CreateDraftResponse {
+  string draft_id = 1;
+}
+
+// UpdateDraftFieldRequest首次更新rev应为1，更新成功会返回服务端更新后的rev，即请求rev
+//每次更新请求的rev字段应为服务端rev+1，如果不符合，会按照以下情况执行：
+//如果服务端rev等于请求rev，更新失败
+//如果服务端rev低于请求rev+1，且fieldMaks不为空，更新失败
+//如果服务端rev+1低于或等于请求，且fieldMask为空，执行全量更新，更新成功
+//如果服务端rev+1大于请求，返回服务端全量最新信息，更新失败
+//其余情况将按照fieldMask配置进行更新
+message UpdateDraftFieldRequest {
+  string draft_id = 1;
+  //评估类型enum
+  EvalType eval_type = 2;
+  //学校
+  string university = 3;
+  //学历
+  string degree = 4;
+  //专业
+  string major = 5;
+  //题目
+  string title = 6;
+  //客户性质
+  string customer_type = 7;
+  //院校级别
+  string university_grade = 8;
+  //论文进度
+  string eval_content = 9;
+  //论文状态
+  string thesis_status = 10;
+  //客户状态
+  repeated string customer_status = 11;
+  //评估要点
+  repeated string eval_focus = 12;
+  //附件资料
+  repeated string upload_content = 13;
+  //销售附言
+  string applicant_ps = 14;
+  //附件
+  repeated string attachment_links = 15;
+  //申请人部门ID
+  int64 applicant_dept_id = 16;
+  //申请人部门名称
+  string applicant_dept_name = 17;
+  // fieldMask应设定需要更新的对应字段名称，如果未查找到相应字段，会返回code:9-FAILED_PRECONDITION错误
+  //注意fieldMask应使用驼峰格式，例如"eval_content"字段应为"evalContent"
+  //例如：
+  // {
+  //   "fieldMask": {
+  //     "paths": [ "degree" ]
+  //   },
+  // }
+  //将只更新degree字段
+  //如果fieldMask字段为空，或fieldMask.paths为空，会全量更新所有字段，包括未设置的字段
+  //未设置字段会更新为默认值，例如string类型空值为""，[]string类型空值为[]
+  google.protobuf.FieldMask field_mask = 18;
+  int64 rev = 19;
+}
+
+// UpdateDraftFieldResponse为更新请求返回结果
+//每次更新均会返回服务端rev及是否更新成功字段success
+//其余字段值将根据请求rev情况决定服务端是否返回信息
+message UpdateDraftFieldResponse {
+  string draft_id = 1;
+  //评估类型enum
+  EvalType eval_type = 2;
+  //学校
+  string university = 3;
+  //学历
+  string degree = 4;
+  //专业
+  string major = 5;
+  //题目
+  string title = 6;
+  //客户性质
+  string customer_type = 7;
+  //院校级别
+  string university_grade = 8;
+  //论文进度
+  string eval_content = 9;
+  //论文状态
+  string thesis_status = 10;
+  //客户状态
+  repeated string customer_status = 11;
+  //评估要点
+  repeated string eval_focus = 12;
+  //附件资料
+  repeated string upload_content = 13;
+  //销售附言
+  string applicant_ps = 14;
+  //附件
+  repeated string attachment_links = 15;
+  //申请人部门ID
+  int64 applicant_dept_id = 16;
+  //申请人部门名称
+  string applicant_dept_name = 17;
+  int64 rev = 18;
+  bool success = 19;
+}
+
+message SubscribeFieldUpdatedRequest {
+  string draft_id = 1;
+}
+
+// SubscribeFieldUpdateResponse会返回客户端请求的更新数据
+//对于更新失败的情况，服务端不会将更新推送至客户端
+//客户端应检查rev，根据fieldMask字段更新数据或向服务端请求最新数据
+message SubscribeFieldUpdatedResponse {
+  string draft_id = 1;
+  //评估类型enum
+  EvalType eval_type = 2;
+  //学校
+  string university = 3;
+  //学历
+  string degree = 4;
+  //专业
+  string major = 5;
+  //题目
+  string title = 6;
+  //客户性质
+  string customer_type = 7;
+  //院校级别
+  string university_grade = 8;
+  //论文进度
+  string eval_content = 9;
+  //论文状态
+  string thesis_status = 10;
+  //客户状态
+  repeated string customer_status = 11;
+  //评估要点
+  repeated string eval_focus = 12;
+  //附件资料
+  repeated string upload_content = 13;
+  //销售附言
+  string applicant_ps = 14;
+  //附件
+  repeated string attachment_links = 15;
+  //申请人部门ID
+  int64 applicant_dept_id = 16;
+  //申请人部门名称
+  string applicant_dept_name = 17;
+  google.protobuf.FieldMask field_mask = 18;
+  int64 rev = 19;
+}
+
+message GetDraftRequest {
+  string draft_id = 1;
+}
+
+message GetDraftResponse {
+  EvalApplication application = 1;
+  int64 rev = 2;
+}
+
+message ListDraftsRequest {}
+
+message ListDraftsResponse {
+  repeated DraftInfo drafts = 1;
+  message DraftInfo {
+    string draft_id = 1;
+    string title = 2;
+    string createdAt = 3;
+    string updateAt = 4;
+  }
+}
+
+message ApplyEvaluationRequest {
+  string draft_id = 1;
+}
+
+message ApplyEvaluationResponse {}
+
+message DelDraftRequest {
+  string draft_id = 1;
+}
+
+message DelDraftResponse {}

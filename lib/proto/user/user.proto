@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+option go_package = "/user";
+
+package user;
+
+service Contact {
+  // GetUser返回企业微信用户信息
+  // https://work.weixin.qq.com/api/doc/90000/90135/90196
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) {};
+  rpc ListDeptMembers(ListDeptMembersRequest)
+      returns (ListDeptMembersResponse) {};
+  rpc ListParentDepts(ListParentDeptsRequest)
+      returns (ListParentDeptsResponse) {};
+  rpc ListChildDepts(ListChildDetpsRequest) returns (ListChildDeptsResponse) {};
+  rpc GetTag(GetTagRequest) returns (GetTagResponse) {};
+  rpc ListDeptsInfo(ListDeptsInfoRequest) returns (ListDeptsInfoResponse) {};
+}
+
+message GetUserRequest {
+  string userID = 1;
+}
+
+message GetUserResponse {
+  string userID = 1;
+  string name = 2;
+  repeated int64 depts = 3;
+  repeated int64 isLeader = 4;
+  string mobile = 5;
+  string email = 6;
+  string avatar = 7;
+  string thumbAvatar = 8;
+}
+
+message ListDeptMembersRequest {
+  int64 deptID = 1;
+}
+
+message ListDeptMembersResponse {
+  repeated DeptMember members = 1;
+  message DeptMember {
+    string userID = 1;
+    string userName = 2;
+  }
+}
+
+message ListParentDeptsRequest {
+  int64 deptID = 1;
+}
+message ListParentDeptsResponse {
+  repeated int64 depts = 1;
+}
+
+message ListChildDetpsRequest {
+  int64 deptID = 1;
+}
+
+message ListChildDeptsResponse {
+  repeated int64 depts = 1;
+}
+
+message GetTagRequest {
+  string tagID = 1;
+}
+
+message GetTagResponse {
+  string tagname = 1;
+  repeated TagUser userList = 2;
+  message TagUser {
+    string userID = 1;
+    string name = 2;
+  }
+  repeated int64 partyList = 3;
+}
+
+message ListDeptsInfoRequest {
+  repeated int64 depts = 1;
+}
+
+message ListDeptsInfoResponse {
+  repeated DeptInfo info = 1;
+  message DeptInfo {
+    int64 ID = 1;
+    string Name = 2;
+    int64 ParentID = 3;
+  }
+}

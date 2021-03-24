@@ -1,0 +1,35 @@
+name: my_app2
+description: A new Flutter project.
+
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  english_words: ^3.1.5
+  flutter_swiper: ^1.1.6
+  async: ^2.2.0
+  grpc: ^3.0.0
+  protobuf: ^2.0.0-nullsafety
+  path_provider: ^2.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/top_bg.png
+    - assets/lake.jpg
+    - assets/test.json
+    - assets/lets-encrypt-r3.pem
+    - assets/lets-encrypt-r3-cross-signed.pem
+    - assets/

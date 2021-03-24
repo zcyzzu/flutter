@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package evaluation.v1;
+
+option go_package = "/pb";
+
+message EvalApplication {
+  string id = 1;
+  //评估类型enum
+  EvalType eval_type = 2;
+  //学校
+  string university = 3;
+  //学历
+  string degree = 4;
+  //专业
+  string major = 5;
+  //题目
+  string title = 6;
+  //客户性质
+  string customer_type = 7;
+  //院校级别
+  string university_grade = 8;
+  //论文进度
+  string eval_content = 9;
+  //论文状态
+  string thesis_status = 10;
+  //客户状态
+  repeated string customer_status = 11;
+  //评估要点
+  repeated string eval_focus = 12;
+  //附件资料
+  repeated string upload_content = 13;
+  //销售附言
+  string applicant_ps = 14;
+  //附件
+  repeated string attachment_links = 15;
+  //申请人部门ID
+  int64 applicant_dept_id = 16;
+  //申请人部门名称
+  string applicant_dept_name = 17;
+  //申请人ID
+  string applicant_id = 18;
+  //申请人姓名
+  string applicant_name = 19;
+  //创建时间
+  // createdAt为RFC3339时间格式字符串，2019-10-12T07:20:50.52Z
+  string created_at = 20;
+  //更新时间
+  // updatedAt为RFC3339时间格式字符串，2019-10-12T07:20:50.52Z
+  string updated_at = 21;
+  repeated string eval_history = 22;
+  int64 dsc_client_id = 23;
+}
+
+enum EvalType {
+  UNKNOWNEVAL = 0;
+  TUTOR = 1;
+  ACADEMIC = 2;
+}

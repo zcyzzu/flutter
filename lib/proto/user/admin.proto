@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+option go_package = "/admin";
+import "google/api/annotations.proto";
+
+package admin;
+
+// Admin负责权限的写入和编辑
+service Authorize {
+  rpc AddPolicy(AddPolicyRequest) returns (AddPolicyResponse) {
+    option (google.api.http) = {
+      post: "/admin/authorize/enforce"
+      body: "*"
+    };
+  };
+  rpc DelPolicy(DelPolicyRequest) returns (DelPolicyResponse) {};
+  rpc AddRole(AddRoleRequest) returns (AddRoleResponse) {};
+}
+
+message AddPolicyRequest {
+  string sub = 1;
+  string dom = 2;
+  string obj = 3;
+  string act = 4;
+  string eft = 5;
+}
+
+message AddPolicyResponse {
+  bool success = 1;
+}
+
+message DelPolicyRequest {
+  string sub = 1;
+  string dom = 2;
+  string obj = 3;
+  string act = 4;
+  string eft = 5;
+}
+
+message DelPolicyResponse {
+  bool success = 1;
+}
+
+message AddRoleRequest {
+  string sub = 1;
+  string role = 2;
+  string dom = 3;
+}
+
+message AddRoleResponse {
+  bool success = 1;
+}

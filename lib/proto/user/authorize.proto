@@ -1,0 +1,87 @@
+// 指定protobuf的版本为proto3
+syntax = "proto3";
+
+option go_package = "/authorize";
+import "google/api/annotations.proto";
+
+//定义proto的包名
+package authorize;
+
+// Authorize负责权限的读取和验证
+service Authorize {
+  rpc Enforce(EnforceRequest) returns (EnforceResponse) {
+    option (google.api.http) = {
+      post: "/authorize/authorize/enforce"
+      body: "*"
+    };
+  };
+  // ListPolicies list all policies for certain sub, dom, eft
+  rpc ListPolicies(ListPoliciesRequest) returns (ListPoliciesResponse) {};
+  rpc ListActs(ListActsRequest) returns (ListActsResponse) {};
+  // ListObjs list all objs for certain sub, dom, act, eft
+  // dom cannot be empty for policy regarding implicit roles
+  rpc ListObjs(ListObjsRequest) returns (ListObjsResponse) {};
+}
+
+// message类型：EnforceRequest。包含四个字段：sub dom obj act
+// string 类型， sub字段名称 1字段序号
+message EnforceRequest {
+  string sub = 1;
+  string dom = 2;
+  string obj = 3;
+  string act = 4;
+}
+
+message EnforceResponse {
+  bool ok = 1;
+}
+
+message EnforceActRequest {
+  string sub = 1;
+  string dom = 2;
+  string act = 3;
+}
+
+message EnforceActResponse {
+  bool ok = 1;
+}
+
+message ListPoliciesRequest {
+  string sub = 1;
+  // make sure dom is not empty
+  string dom = 2;
+  // default to "allow"
+  string eft = 3;
+}
+
+message ListPoliciesResponse {
+  repeated Policy policies = 1;
+}
+
+message Policy {
+  string obj = 1;
+  string act = 2;
+}
+
+message ListActsRequest {
+  string sub = 1;
+  string dom = 2;
+  string obj = 3;
+}
+
+message ListActsResponse {
+  repeated string acts = 1;
+}
+
+message ListObjsRequest {
+  string sub = 1;
+  // make sure dom is not empty
+  string dom = 2;
+  string act = 3;
+  // default to "allow"
+  string eft = 4;
+}
+
+message ListObjsResponse {
+  repeated string objs = 1;
+}
